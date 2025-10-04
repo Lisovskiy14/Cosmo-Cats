@@ -1,0 +1,22 @@
+openapi: "3.1.0"
+info:
+  title: Cosmo cats Intergalactic Marketplace - Product API
+  version: "1.0"
+  description: REST API for managing products.
+servers:
+  - url: https://localhost:8080
+    description: Local server
+tags:
+  - name: Products
+    description: CRUD operations about products
+
+paths:
+  /api/products:
+    get:
+      responses:
+        '200':
+          description: OK
+    post:
+      responses:
+        '201':
+          description: Created
