@@ -32,6 +32,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product updateProduct(Long id, Product product) {
+        if (!products.containsKey(id)) {
+            throw new IllegalArgumentException("Product with id " + id + " not found.");
+        }
         products.put(id, product);
         return product;
     }
