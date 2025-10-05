@@ -5,6 +5,7 @@ import com.example.cosmocats.dto.product.ProductRequest;
 import com.example.cosmocats.dto.product.ProductDTO;
 import org.mapstruct.Mapper;
 
+
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
     ProductDTO toDto(Product product);
