@@ -2,6 +2,7 @@ package com.example.cosmocats.service.impl;
 
 import com.example.cosmocats.domain.Product;
 import com.example.cosmocats.service.ProductService;
+import com.example.cosmocats.service.exception.NoSuchResourceException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -19,6 +20,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product getProductById(Long id) {
+        checkForResourceById(id);
         return products.get(id);
     }
 
@@ -32,15 +34,21 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product updateProduct(Long id, Product product) {
-        if (!products.containsKey(id)) {
-            throw new IllegalArgumentException("Product with id " + id + " not found.");
-        }
+        checkForResourceById(id);
+        product.setId(id);
         products.put(id, product);
         return product;
     }
 
     @Override
     public void deleteProductById(Long id) {
+        checkForResourceById(id);
         products.remove(id);
+    }
+
+    private void checkForResourceById(Long id) {
+        if (!products.containsKey(id)) {
+            throw new NoSuchResourceException("Product with id " + id + " not found.");
+        }
     }
 }

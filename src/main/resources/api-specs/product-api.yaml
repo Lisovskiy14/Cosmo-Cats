@@ -13,10 +13,159 @@ tags:
 paths:
   /api/products:
     get:
+      summary: Get all products
+      tags:
+      - Products
       responses:
         '200':
-          description: OK
+          description: List of all products
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListDTO'
     post:
+      summary: Create a new product
+      tags:
+        - Products
       responses:
         '201':
           description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDTO'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+
+  /api/products/{id}:
+    get:
+      summary: Get product by id
+      tags:
+        - Products
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Product id
+      responses:
+        '200':
+          description: Product by id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDTO'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+    put:
+      summary: Update product by id
+      tags:
+        - Products
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Product id
+      responses:
+        '200':
+          description: Successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+    delete:
+      summary: Delete product by id
+      tags:
+        - Products
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Product id
+      responses:
+        '204':
+          description: Successfully deleted
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+
+components:
+  schemas:
+    ProductListDTO:
+      description: DTO for returning a list of all products
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductDTO'
+    ProductDTO:
+      description: DTO for returning product data
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: double
+    ProductRequest:
+      description: DTO for requesting to create or update a product
+      type: object
+      required:
+        - name
+        - description
+        - price
+      properties:
+        name:
+          description: must be between 3 and 20 characters long and contain at least one cosmic word
+          type: string
+        description:
+          description: must be between 10 and 100 characters long
+          type: string
+        price:
+          description: must be greater than 0 inclusive
+          type: number
+          format: double
+    ExceptionResponse:
+      description: DTO for returning error messages
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
