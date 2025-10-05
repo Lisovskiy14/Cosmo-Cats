@@ -8,11 +8,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Constraint(validatedBy = StartsWithUpperCaseValidator.class)
+@Constraint(validatedBy = CosmicWordValidator.class)
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface StartsWithUpperCase {
-    String message() default "Field must start with upper case letter.";
+public @interface CosmicWordCheck {
+    String message() default "Field must contain at least one cosmic word (e.g. 'cosmo', 'galaxy', 'star', 'comet')";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
