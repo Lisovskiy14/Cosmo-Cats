@@ -11,7 +11,7 @@ tags:
     description: CRUD operations about products
 
 paths:
-  /api/products:
+  /api/v1/products:
     get:
       summary: Get all products
       tags:
@@ -40,8 +40,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
 
-  /api/products/{id}:
+  /api/v1/products/{id}:
     get:
       summary: Get product by id
       tags:
@@ -107,12 +113,6 @@ paths:
       responses:
         '204':
           description: Successfully deleted
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
 
 components:
   schemas:
