@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CosmicWordCheck {
-    String message() default "Field must contain at least one cosmic word (e.g. 'cosmo', 'galaxy', 'star', 'comet')";
+    String message() default "must contain at least one cosmic word (e.g. 'cosmo', 'galaxy', 'star', 'comet')";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

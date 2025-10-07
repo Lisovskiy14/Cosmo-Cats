@@ -2,16 +2,17 @@ package com.example.cosmocats.service.impl;
 
 import com.example.cosmocats.domain.Product;
 import com.example.cosmocats.service.ProductService;
-import com.example.cosmocats.service.exception.NoSuchResourceException;
+import com.example.cosmocats.service.exception.ProductNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 @Service
 public class ProductServiceImpl implements ProductService {
-    private final Map<Long, Product> products = new HashMap<>();
-    private final AtomicLong counter = new AtomicLong(0);
+    private final Map<UUID, Product> products = new ConcurrentHashMap<>();
 
     @Override
     public List<Product> getAllProducts() {
@@ -19,36 +20,39 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product getProductById(Long id) {
+    public Product getProductById(UUID id) {
         checkForResourceById(id);
+        log.info("Product with id {} has been found", id);
         return products.get(id);
     }
 
     @Override
     public Product saveProduct(Product product) {
-        product.setId(counter.get());
-        products.put(counter.get(), product);
-        counter.incrementAndGet();
+        UUID id = UUID.randomUUID();
+        product.setId(id);
+        products.put(id, product);
+        log.info("New product with id {} has been saved", id);
         return product;
     }
 
     @Override
-    public Product updateProduct(Long id, Product product) {
+    public Product updateProduct(UUID id, Product product) {
         checkForResourceById(id);
         product.setId(id);
         products.put(id, product);
+        log.info("Product with id {} has been updated", id);
         return product;
     }
 
     @Override
-    public void deleteProductById(Long id) {
-        checkForResourceById(id);
+    public void deleteProductById(UUID id) {
         products.remove(id);
+        log.info("Product with id {} has been deleted", id);
     }
 
-    private void checkForResourceById(Long id) {
+    private void checkForResourceById(UUID id) {
         if (!products.containsKey(id)) {
-            throw new NoSuchResourceException("Product with id " + id + " not found.");
+            throw new ProductNotFoundException(id.toString());
         }
     }
 }

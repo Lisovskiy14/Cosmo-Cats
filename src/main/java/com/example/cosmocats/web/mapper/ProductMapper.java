@@ -1,4 +1,4 @@
-package com.example.cosmocats.mapper;
+package com.example.cosmocats.web.mapper;
 
 import com.example.cosmocats.domain.Product;
 import com.example.cosmocats.dto.product.ProductRequest;

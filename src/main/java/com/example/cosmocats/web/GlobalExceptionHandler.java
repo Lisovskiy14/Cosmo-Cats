@@ -1,51 +1,72 @@
 package com.example.cosmocats.web;
 
-import com.example.cosmocats.dto.exception.ExceptionResponse;
-import com.example.cosmocats.service.exception.NoSuchResourceException;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
+import com.example.cosmocats.service.exception.ProductIdAlreadyExistsException;
+import com.example.cosmocats.util.ProductValidationUtil;
+import com.example.cosmocats.web.exception.ParamsValidationDetails;
+import com.example.cosmocats.service.exception.ProductNotFoundException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.net.URI;
+import java.util.List;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+@Slf4j
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex,
-            HttpServletRequest request
+            HttpHeaders headers,
+            HttpStatusCode status,
+            WebRequest request
     ) {
-        FieldError fieldError = ex.getBindingResult().getFieldError();
-        String errorMessage = String.format("Validation failed for object '%s': %s",
-                fieldError != null ? fieldError.getObjectName() : "unknown",
-                fieldError != null ? fieldError.getDefaultMessage() : "unknown message."
-        );
-
-        ExceptionResponse exceptionResponse = ExceptionResponse.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error("Bad Request")
-                .message(errorMessage)
-                .path(request.getRequestURI())
-                .build();
-        return ResponseEntity.badRequest()
-                .body(exceptionResponse);
+        log.info("Validation Error has occurred");
+        List<ParamsValidationDetails> validationDetails = ex.getFieldErrors().stream()
+                .map(err -> ParamsValidationDetails.builder()
+                        .field(err.getField())
+                        .message(err.getDefaultMessage())
+                        .build()
+                )
+                .toList();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ProductValidationUtil.getProblemDetailByValidationDetails(validationDetails));
     }
 
-    @ExceptionHandler(NoSuchResourceException.class)
-    public ResponseEntity<ExceptionResponse> handleNoSuchResourceException(
-            NoSuchResourceException ex,
-            HttpServletRequest request
-    ) {
-        ExceptionResponse exceptionResponse = ExceptionResponse.builder()
-                .status(HttpStatus.NOT_FOUND.value())
-                .error("Not Found")
-                .message(ex.getMessage())
-                .path(request.getRequestURI())
-                .build();
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<Object> handleProductNotFound(ProductNotFoundException ex) {
+        log.info("Product Not Found exception has occurred");
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problemDetail.setType(URI.create("urn:problem-type:not-found"));
+        problemDetail.setTitle("Product Not Found Exception");
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(exceptionResponse);
+                .body(problemDetail);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleInternalServerError(Exception ex) {
+        log.info("Internal Server Error has occurred");
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        problemDetail.setType(URI.create("urn:problem-type:internal-server-error"));
+        problemDetail.setTitle("Internal Server Error");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(problemDetail);
+    }
+
+    @ExceptionHandler(ProductIdAlreadyExistsException.class)
+    public ResponseEntity<Object> handleProductIdAlreadyExists(ProductIdAlreadyExistsException ex) {
+        log.info("Product Id Already Exists exception has occurred");
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+        problemDetail.setType(URI.create("urn:problem-type:conflict-error"));
+        problemDetail.setTitle("Product Id Already Exists Exception");
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(problemDetail);
     }
 }

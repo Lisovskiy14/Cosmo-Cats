@@ -4,10 +4,11 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 public class Order {
-    private Long id;
+    private UUID id;
     private List<Product> products = new ArrayList<>();
     private double totalPrice;
 }
