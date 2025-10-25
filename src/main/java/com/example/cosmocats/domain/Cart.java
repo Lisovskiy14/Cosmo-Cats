@@ -1,12 +1,12 @@
 package com.example.cosmocats.domain;
 
-import lombok.Data;
+import lombok.Value;
 
 import java.util.List;
 import java.util.UUID;
 
-@Data
+@Value
 public class Cart {
-    private UUID id;
-    private List<Product> products;
+    UUID id;
+    List<Product> products;
 }

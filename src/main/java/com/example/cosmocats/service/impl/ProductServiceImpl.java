@@ -1,5 +1,6 @@
 package com.example.cosmocats.service.impl;
 
+import com.example.cosmocats.domain.Cart;
 import com.example.cosmocats.domain.Product;
 import com.example.cosmocats.service.ProductService;
 import com.example.cosmocats.service.exception.ProductNotFoundException;

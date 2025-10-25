@@ -5,6 +5,6 @@ import lombok.Value;
 import java.util.List;
 
 @Value
-public class ProductListDTO {
-    List<ProductDTO> products;
+public class ProductListDto {
+    List<ProductDto> products;
 }

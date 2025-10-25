@@ -1,9 +1,9 @@
 package com.example.cosmocats.web;
 
 import com.example.cosmocats.domain.Product;
-import com.example.cosmocats.dto.product.ProductRequest;
-import com.example.cosmocats.dto.product.ProductDTO;
-import com.example.cosmocats.dto.product.ProductListDTO;
+import com.example.cosmocats.dto.product.ProductRequestDto;
+import com.example.cosmocats.dto.product.ProductDto;
+import com.example.cosmocats.dto.product.ProductListDto;
 import com.example.cosmocats.web.mapper.ProductMapper;
 import com.example.cosmocats.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +24,10 @@ public class ProductController {
     private final ProductMapper productMapper;
 
     @GetMapping
-    public ResponseEntity<ProductListDTO> getAllProducts() {
+    public ResponseEntity<ProductListDto> getAllProducts() {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new ProductListDTO(
+                .body(new ProductListDto(
                         productService.getAllProducts().stream()
                                 .map(productMapper::toProductDto)
                                 .collect(Collectors.toList()))
@@ -35,7 +35,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDTO> getProductById(@PathVariable UUID id) {
+    public ResponseEntity<ProductDto> getProductById(@PathVariable UUID id) {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(productMapper
@@ -44,8 +44,8 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductDTO> saveProduct(@Valid @RequestBody ProductRequest productRequest) {
-        Product product = productMapper.toProduct(productRequest);
+    public ResponseEntity<ProductDto> saveProduct(@Valid @RequestBody ProductRequestDto productRequestDto) {
+        Product product = productMapper.toProduct(productRequestDto);
         Product savedProduct = productService.saveProduct(product);
         return ResponseEntity.status(201)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -53,8 +53,8 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductDTO> updateProduct(@PathVariable UUID id, @Valid @RequestBody ProductRequest productRequest) {
-        Product product = productMapper.toProduct(productRequest);
+    public ResponseEntity<ProductDto> updateProduct(@PathVariable UUID id, @Valid @RequestBody ProductRequestDto productRequestDto) {
+        Product product = productMapper.toProduct(productRequestDto);
         Product updatedProduct = productService.updateProduct(id, product);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)

@@ -1,11 +1,11 @@
 package com.example.cosmocats.domain;
 
-import lombok.Data;
+import lombok.Value;
 
 import java.util.UUID;
 
-@Data
+@Value
 public class Category {
-    private UUID id;
-    private String name;
+    UUID id;
+    String name;
 }

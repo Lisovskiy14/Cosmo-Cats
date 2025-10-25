@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Value;
 
 @Value
-public class ProductRequest {
+public class ProductRequestDto {
 
     @NotBlank(message = "is required")
     @Size(min = 3, max = 20, message = "must be between 3 and 20 characters long")
