@@ -1,0 +1,16 @@
+package com.example.cosmocats.domain;
+
+import lombok.Builder;
+import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+@Data
+@Builder
+public class Order {
+    private UUID id;
+    private List<Product> products = new ArrayList<>();
+    private double totalPrice;
+}

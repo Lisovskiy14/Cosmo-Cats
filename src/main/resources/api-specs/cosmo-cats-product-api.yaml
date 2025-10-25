@@ -1,0 +1,234 @@
+openapi: "3.1.0"
+info:
+  title: Cosmo cats Intergalactic Marketplace - Product API
+  version: "1.0"
+  description: REST API for managing products.
+servers:
+  - url: https://localhost:8080
+    description: Local server
+tags:
+  - name: Products
+    description: CRUD operations about products
+
+paths:
+  /api/v1/products:
+    get:
+      summary: Get all products
+      tags:
+      - Products
+      responses:
+        '200':
+          description: List of all products
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListDTO'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+    post:
+      summary: Create a new product
+      tags:
+        - Products
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDTO'
+        '400':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /api/v1/products/{id}:
+    get:
+      summary: Get product by id
+      tags:
+        - Products
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Product id
+      responses:
+        '200':
+          description: Product by id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDTO'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+    put:
+      summary: Update product by id
+      tags:
+        - Products
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Product id
+      responses:
+        '200':
+          description: Successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDTO'
+        '400':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+    delete:
+      summary: Delete product by id
+      tags:
+        - Products
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Product id
+      responses:
+        '204':
+          description: No Content
+
+components:
+  schemas:
+    ProductListDTO:
+      description: DTO for returning a list of all products
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductDTO'
+
+    ProductDTO:
+      description: DTO for returning product data
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: double
+      example:
+        id: 885e4a70-e3d6-4968-adfd-4ab7ca66571d
+        name: Galaxy cat food
+        description: Very good for your cat's health
+        price: 100.00
+
+    ProductRequest:
+      description: DTO for requesting to create or update a product
+      type: object
+      required:
+        - name
+        - description
+        - price
+      properties:
+        name:
+          description: must be between 3 and 20 characters long and contain at least one cosmic word
+          type: string
+        description:
+          description: must be between 10 and 100 characters long
+          type: string
+        price:
+          description: must be greater than 1 inclusive
+          type: number
+          format: double
+      example:
+        name: Galaxy cat food
+        description: Very good for your cat's health
+        price: 100.00
+
+    ProblemDetail:
+      description: DTO for returning error messages
+      type: object
+      required:
+        - type
+        - title
+        - status
+        - detail
+        - instance
+      properties:
+        type:
+          type: string
+          example: urn:problem-type:validation-error
+        title:
+          type: string
+          example: Failed Validation Exception
+        status:
+          type: integer
+          format: int32
+          example: 400
+        detail:
+          type: string
+          example: Request validation failed
+        instance:
+          type: string
+          example: /api/v1/products
+        validationErrors:
+          description: Only for validation errors
+          type: string
+          example: [
+            {
+              "field": "name",
+              "message": "must contain at least one cosmic word (e.g. 'cosmo', 'galaxy', 'star', 'comet')"
+            }
+          ]
