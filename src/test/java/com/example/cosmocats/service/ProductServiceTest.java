@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(classes = {ProductServiceImpl.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisplayName("Product Service Tests")
-public class ProductServiceIT {
+public class ProductServiceTest {
 
     @Autowired
     private ProductService productService;
@@ -50,6 +50,7 @@ public class ProductServiceIT {
     @ParameterizedTest
     @MethodSource("provideProducts")
     @Order(1)
+    @DisplayName("Parameterized Save Product Test")
     public void shouldSaveProduct(Product product) {
         when(productRepository.saveProduct(productArgumentCaptor.capture()))
                 .thenAnswer(inv -> inv.getArgument(0));
@@ -68,6 +69,7 @@ public class ProductServiceIT {
 
     @Test
     @Order(2)
+    @DisplayName("Get All Products Test")
     public void shouldGetAllProducts() {
         List<Product> products = provideProducts().toList();
         when(productRepository.getAllProducts()).thenReturn(products);
@@ -81,12 +83,14 @@ public class ProductServiceIT {
 
     @Test
     @Order(3)
+    @DisplayName("Should Throw ProductNotFoundException")
     public void shouldThrowProductNotFoundException() {
         assertThrows(ProductNotFoundException.class, () -> productService.getProductById(UUID.randomUUID()));
     }
 
     @Test
     @Order(4)
+    @DisplayName("Delete Products Test")
     public void shouldDeleteProducts() {
         List<UUID> productIds = provideProducts().map(Product::getId).toList();
 
@@ -98,6 +102,7 @@ public class ProductServiceIT {
 
     @Test
     @Order(5)
+    @DisplayName("Delete Product By Wrong ID Test")
     public void shouldNotThrowExceptionOnDeleteProductByWrongId() {
         assertThatNoException().isThrownBy(() -> productService.deleteProductById(UUID.randomUUID()));
     }

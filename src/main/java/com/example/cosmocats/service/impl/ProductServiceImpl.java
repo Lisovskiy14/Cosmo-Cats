@@ -2,6 +2,7 @@ package com.example.cosmocats.service.impl;
 
 import com.example.cosmocats.domain.Product;
 import com.example.cosmocats.service.ProductService;
+import com.example.cosmocats.service.exception.ProductIdAlreadyExistsException;
 import com.example.cosmocats.service.exception.ProductNotFoundException;
 import com.example.cosmocats.service.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product saveProduct(Product product) {
         UUID id = UUID.randomUUID();
+        if (productRepository.existsById(id)) {
+            throw new ProductIdAlreadyExistsException(id.toString());
+        }
         product.setId(id);
         productRepository.saveProduct(product);
         log.info("New product with id {} has been saved", id);
