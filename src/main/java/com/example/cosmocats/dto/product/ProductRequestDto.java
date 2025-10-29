@@ -5,9 +5,13 @@ import com.example.cosmocats.dto.validation.CosmicWordCheck;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
 @Value
+@Builder
+@Jacksonized
 public class ProductRequestDto {
 
     @NotBlank(message = "is required")
