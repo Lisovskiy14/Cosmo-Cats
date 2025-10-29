@@ -98,6 +98,7 @@ public class ProductServiceTest {
         int postLength = productService.getAllProducts().size();
 
         assertEquals(0, postLength);
+        verify(productRepository, times(4)).deleteProductById(any(UUID.class));
     }
 
     @Test

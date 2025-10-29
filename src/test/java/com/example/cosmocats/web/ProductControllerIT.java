@@ -7,6 +7,7 @@ import com.example.cosmocats.service.ProductService;
 import com.example.cosmocats.service.repository.ProductRepository;
 import com.example.cosmocats.web.mapper.ProductMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.mockito.Mockito.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,7 +37,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @DisplayName("ProductController IT")
 @Tag("product-service")
-//@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProductControllerIT extends AbstractIT {
 
     private final ProductRequestDto PRODUCT_REQUEST_DTO = buildProductRequestDto("Galaxy product", 100);
@@ -188,6 +192,11 @@ public class ProductControllerIT extends AbstractIT {
     @SneakyThrows
     @DisplayName("Should Delete Product Test")
     public void shouldDeleteProduct() {
+        stubFor(WireMock.post("/payment-service/api/v1/payments")
+                .willReturn(aResponse().withStatus(200)
+                        .withHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                        .withBody("Some success payment response body")));
+
         mockMvc.perform(delete("/api/v1/products/{id}", UUID.randomUUID())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
