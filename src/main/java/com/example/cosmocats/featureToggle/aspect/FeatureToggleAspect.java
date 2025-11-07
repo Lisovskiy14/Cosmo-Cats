@@ -1,6 +1,7 @@
 package com.example.cosmocats.featureToggle.aspect;
 
-import com.example.cosmocats.config.FeatureToggleProperties;
+import com.example.cosmocats.featureToggle.service.FeatureToggleService;
+import com.example.cosmocats.featureToggle.service.impl.FeatureToggleServiceImpl;
 import com.example.cosmocats.featureToggle.annotation.FeatureToggle;
 import com.example.cosmocats.featureToggle.exception.FeatureNotAvailableException;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class FeatureToggleAspect {
-    private final FeatureToggleProperties featureProps;
+    private final FeatureToggleService featureToggleService;
 
     @Around("@annotation(featureToggle)")
     public Object featureToggle(ProceedingJoinPoint joinPoint, FeatureToggle featureToggle) throws Throwable {
@@ -24,7 +25,7 @@ public class FeatureToggleAspect {
 
     private Object isFeatureEnabled(ProceedingJoinPoint joinPoint, FeatureToggle featureToggle) throws Throwable {
         String featureName = featureToggle.value().getFeatureName();
-        if (featureProps.checkFeature(featureName)) {
+        if (featureToggleService.isEnabled(featureName)) {
             return joinPoint.proceed();
         }
 
