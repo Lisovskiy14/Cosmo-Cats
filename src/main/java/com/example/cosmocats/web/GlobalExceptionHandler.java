@@ -1,7 +1,6 @@
 package com.example.cosmocats.web;
 
 import com.example.cosmocats.featureToggle.exception.FeatureNotAvailableException;
-import com.example.cosmocats.featureToggle.exception.FeatureNotFoundException;
 import com.example.cosmocats.service.exception.ProductIdAlreadyExistsException;
 import com.example.cosmocats.util.ProductValidationUtil;
 import com.example.cosmocats.web.exception.ParamsValidationDetails;
@@ -80,16 +79,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
         problemDetail.setType(URI.create("urn:problem-type:not-found"));
         problemDetail.setTitle("Feature Not Available Exception");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .contentType(MediaType.APPLICATION_PROBLEM_JSON)
-                .body(problemDetail);
-    }
-
-    @ExceptionHandler(FeatureNotFoundException.class)
-    public ResponseEntity<Object> handleFeatureNotAvailable(FeatureNotFoundException ex) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
-        problemDetail.setType(URI.create("urn:problem-type:not-found"));
-        problemDetail.setTitle("Feature Not Found Exception");
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .contentType(MediaType.APPLICATION_PROBLEM_JSON)
                 .body(problemDetail);

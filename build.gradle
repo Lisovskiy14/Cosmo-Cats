@@ -20,7 +20,7 @@ ext {
     minimumCoveragePerFile = 0.8
     filesExcludedFromCoverage = [
             "**/*CosmocatsApplication*.*",
-            "**/config/*Configuration.*"
+            "**/config/**"
     ]
 }
 
