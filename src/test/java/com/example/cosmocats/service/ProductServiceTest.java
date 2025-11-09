@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = {ProductServiceImpl.class})
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisplayName("Product Service Tests")
 public class ProductServiceTest {
 
@@ -49,7 +48,6 @@ public class ProductServiceTest {
 
     @ParameterizedTest
     @MethodSource("provideProducts")
-    @Order(1)
     @DisplayName("Parameterized Save Product Test")
     public void shouldSaveProduct(Product product) {
         when(productRepository.saveProduct(productArgumentCaptor.capture()))
@@ -68,7 +66,6 @@ public class ProductServiceTest {
     }
 
     @Test
-    @Order(2)
     @DisplayName("Get All Products Test")
     public void shouldGetAllProducts() {
         List<Product> products = provideProducts().toList();
@@ -82,14 +79,12 @@ public class ProductServiceTest {
     }
 
     @Test
-    @Order(3)
     @DisplayName("Should Throw ProductNotFoundException")
     public void shouldThrowProductNotFoundException() {
         assertThrows(ProductNotFoundException.class, () -> productService.getProductById(UUID.randomUUID()));
     }
 
     @Test
-    @Order(4)
     @DisplayName("Delete Products Test")
     public void shouldDeleteProducts() {
         List<UUID> productIds = provideProducts().map(Product::getId).toList();
@@ -102,7 +97,6 @@ public class ProductServiceTest {
     }
 
     @Test
-    @Order(5)
     @DisplayName("Delete Product By Wrong ID Test")
     public void shouldNotThrowExceptionOnDeleteProductByWrongId() {
         assertThatNoException().isThrownBy(() -> productService.deleteProductById(UUID.randomUUID()));
