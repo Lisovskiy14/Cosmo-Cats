@@ -1,0 +1,6 @@
+databaseChangeLog:
+  - changeSet:
+      id: lab-3-1
+      author: lisovskiy14
+      changes:
+        # Create Table Customer
