@@ -1,0 +1,77 @@
+databaseChangeLog:
+  - changeSet:
+      id: lab-3-1
+      author: lisovskiy14
+      changes:
+
+        # Create Table Customer
+        - createTable:
+            tableName: customers
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  defaultValueComputed: "gen_random_uuid()"
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: first_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: phone_number
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: true
+
+        - addUniqueConstraint:
+            tableName: customers
+            columnNames: email
+            constraintName: uq_customers_email
+        - addUniqueConstraint:
+            tableName: customers
+            columnNames: phone_number
+            constraintName: uq_customers_phone_number
+
+        # Create Table Customer Addresses
+        - createTable:
+            tableName: customer_addresses
+            columns:
+              - column:
+                  name: customer_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: country
+                  type: VARCHAR(255)
+              - column:
+                  name: city
+                  type: VARCHAR(255)
+              - column:
+                  name: street
+                  type: VARCHAR(255)
+              - column:
+                  name: house
+                  type: VARCHAR(10)
+              - column:
+                  name: apartment
+                  type: VARCHAR(10)
+
+        - addForeignKeyConstraint:
+            baseTableName: customers
+            baseColumnNames: id
+            referencedTableName: customer_addresses
+            referencedColumnNames: customer_id
+            constraintName: fk_customers_address_id

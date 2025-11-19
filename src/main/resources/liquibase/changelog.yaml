@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: liquibase/db.changelog-customer.yaml
+  - include:
+      file: liquibase/db.changelog-product.yaml
+  - include:
+      file: liquibase/db.changelog-order.yaml

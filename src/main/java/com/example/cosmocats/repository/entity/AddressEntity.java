@@ -14,8 +14,13 @@ import java.util.UUID;
 public class AddressEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @Column(name = "customer_id")
+    private UUID customerId;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "customer_id")
+    private CustomerEntity customer;
 
     private String country;
     private String city;

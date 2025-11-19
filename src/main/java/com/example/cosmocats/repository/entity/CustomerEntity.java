@@ -30,14 +30,13 @@ public class CustomerEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(name = "phone_number", nullable = false, unique = true)
+    @Column(name = "phone_number", unique = true)
     private String phoneNumber;
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-            orphanRemoval = true,
-            fetch = FetchType.LAZY
+    @OneToOne(mappedBy = "customer",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            orphanRemoval = true
     )
-    @JoinColumn(name = "address_id", nullable = false)
     private AddressEntity address;
 
     @OneToMany(mappedBy = "customer",

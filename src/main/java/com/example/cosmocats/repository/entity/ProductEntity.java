@@ -11,7 +11,12 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "products")
+@Table(name = "products", uniqueConstraints = {
+        @UniqueConstraint(
+                name = "uq_product_name_category",
+                columnNames = {"name", "category_id"}
+        )
+})
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,6 +36,6 @@ public class ProductEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private CategoryEntity category;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 }
