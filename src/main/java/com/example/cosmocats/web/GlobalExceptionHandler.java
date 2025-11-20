@@ -1,7 +1,6 @@
 package com.example.cosmocats.web;
 
 import com.example.cosmocats.featureToggle.exception.FeatureNotAvailableException;
-import com.example.cosmocats.service.exception.ProductIdAlreadyExistsException;
 import com.example.cosmocats.util.ProductValidationUtil;
 import com.example.cosmocats.web.exception.ParamsValidationDetails;
 import com.example.cosmocats.service.exception.ProductNotFoundException;

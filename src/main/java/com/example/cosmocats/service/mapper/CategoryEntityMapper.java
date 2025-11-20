@@ -5,7 +5,7 @@ import com.example.cosmocats.repository.entity.CategoryEntity;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface CategoryServiceMapper {
+public interface CategoryEntityMapper {
     Category toCategory(CategoryEntity categoryEntity);
     CategoryEntity toCategoryEntity(Category category);
 }

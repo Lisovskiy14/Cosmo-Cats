@@ -5,7 +5,7 @@ import com.example.cosmocats.repository.CategoryRepository;
 import com.example.cosmocats.repository.entity.CategoryEntity;
 import com.example.cosmocats.service.CategoryService;
 import com.example.cosmocats.service.exception.CategoryNotFoundException;
-import com.example.cosmocats.service.mapper.CategoryServiceMapper;
+import com.example.cosmocats.service.mapper.CategoryEntityMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,13 +17,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
-    private final CategoryServiceMapper categoryServiceMapper;
+    private final CategoryEntityMapper categoryEntityMapper;
 
     @Override
     @Transactional(readOnly = true)
     public List<Category> getAllCategories() {
         return categoryRepository.findAll().stream()
-                .map(categoryServiceMapper::toCategory)
+                .map(categoryEntityMapper::toCategory)
                 .toList();
     }
 
@@ -31,15 +31,22 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     public Category getCategoryById(UUID id) {
         CategoryEntity categoryEntity = categoryRepository.findById(id)
-                .orElseThrow(() -> new CategoryNotFoundException(id.toString()));
-        return categoryServiceMapper.toCategory(categoryEntity);
+                .orElseThrow(() -> new CategoryNotFoundException(id));
+        return categoryEntityMapper.toCategory(categoryEntity);
+    }
+
+    @Override
+    public Category getCategoryByName(String name) {
+        CategoryEntity categoryEntity = categoryRepository.findByName(name)
+                .orElseThrow(() -> new CategoryNotFoundException(name));
+        return categoryEntityMapper.toCategory(categoryEntity);
     }
 
     @Override
     @Transactional
     public Category saveCategory(Category category) {
-        CategoryEntity categoryEntity = categoryServiceMapper.toCategoryEntity(category);
-        return categoryServiceMapper.toCategory(
+        CategoryEntity categoryEntity = categoryEntityMapper.toCategoryEntity(category);
+        return categoryEntityMapper.toCategory(
                 categoryRepository.save(categoryEntity));
     }
 

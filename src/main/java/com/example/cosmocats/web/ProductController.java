@@ -4,9 +4,11 @@ import com.example.cosmocats.domain.Product;
 import com.example.cosmocats.dto.product.ProductRequestDto;
 import com.example.cosmocats.dto.product.ProductDto;
 import com.example.cosmocats.dto.product.ProductListDto;
+import com.example.cosmocats.dto.product.UpdateProductRequestDto;
 import com.example.cosmocats.web.mapper.ProductMapper;
 import com.example.cosmocats.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,21 +46,22 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductDto> saveProduct(@Valid @RequestBody ProductRequestDto productRequestDto) {
-        Product product = productMapper.toProduct(productRequestDto);
-        Product savedProduct = productService.saveProduct(product);
-        return ResponseEntity.status(201)
+    public ResponseEntity<ProductDto> createProduct(@Valid @RequestBody ProductRequestDto productRequestDto) {
+        Product savedProduct = productService.createProduct(productRequestDto);
+        return ResponseEntity.status(HttpStatus.CREATED)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(productMapper.toProductDto(savedProduct));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductDto> updateProduct(@PathVariable UUID id, @Valid @RequestBody ProductRequestDto productRequestDto) {
-        Product product = productMapper.toProduct(productRequestDto);
-        Product updatedProduct = productService.updateProduct(id, product);
+    @PutMapping("/{productId}")
+    public ResponseEntity<ProductDto> updateProduct(
+            @PathVariable UUID productId,
+            @Valid @RequestBody UpdateProductRequestDto updateProductRequestDto
+    ) {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(productMapper.toProductDto(updatedProduct));
+                .body(productMapper.toProductDto(
+                        productService.updateProduct(productId, updateProductRequestDto)));
     }
 
     @DeleteMapping("/{id}")

@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
+import java.math.BigDecimal;
+
 @Value
 @Builder
 @Jacksonized
@@ -12,5 +14,5 @@ public class ProductDto {
     String name;
     String description;
     String categoryName;
-    double price;
+    BigDecimal price;
 }

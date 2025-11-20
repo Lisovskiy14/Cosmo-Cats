@@ -1,9 +1,9 @@
 package com.example.cosmocats.service;
 
 import com.example.cosmocats.domain.Product;
+import com.example.cosmocats.repository.ProductRepository;
 import com.example.cosmocats.service.exception.ProductNotFoundException;
 import com.example.cosmocats.service.impl.ProductServiceImpl;
-import com.example.cosmocats.service.repository.ProductRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -50,13 +50,13 @@ public class ProductServiceTest {
     @MethodSource("provideProducts")
     @DisplayName("Parameterized Save Product Test")
     public void shouldSaveProduct(Product product) {
-        when(productRepository.saveProduct(productArgumentCaptor.capture()))
+        when(productRepository.save(productArgumentCaptor.capture()))
                 .thenAnswer(inv -> inv.getArgument(0));
 
-        Product savedProduct = productService.saveProduct(product);
+        Product savedProduct = productService.createProduct(product);
 
-        verify(productRepository, times(1)).saveProduct(any(Product.class));
-        assertThatNoException().isThrownBy(() -> productService.saveProduct(product));
+        verify(productRepository, times(1)).save(any(Product.class));
+        assertThatNoException().isThrownBy(() -> productService.createProduct(product));
 
         assertThat(savedProduct).isNotNull();
         assertThat(savedProduct.getId()).isEqualTo(product.getId());
@@ -69,11 +69,11 @@ public class ProductServiceTest {
     @DisplayName("Get All Products Test")
     public void shouldGetAllProducts() {
         List<Product> products = provideProducts().toList();
-        when(productRepository.getAllProducts()).thenReturn(products);
+        when(productRepository.findAll()).thenReturn(products);
 
         List<Product> foundProducts = productService.getAllProducts();
 
-        verify(productRepository, times(1)).getAllProducts();
+        verify(productRepository, times(1)).findAll();
         assertThat(foundProducts).isNotNull();
         assertEquals(products.size(), foundProducts.size());
     }
@@ -93,7 +93,7 @@ public class ProductServiceTest {
         int postLength = productService.getAllProducts().size();
 
         assertEquals(0, postLength);
-        verify(productRepository, times(4)).deleteProductById(any(UUID.class));
+        verify(productRepository, times(4)).deleteById(any(UUID.class));
     }
 
     @Test
