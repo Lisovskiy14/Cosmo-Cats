@@ -23,6 +23,10 @@ public class ProductRequestDto {
     @Size(min = 10, max = 100, message = "must be between 10 and 100 characters long")
     String description;
 
+    @NotBlank(message = "is required")
+    @Size(min = 3, max = 20, message = "must be between 2 and 20 characters long")
+    String categoryName;
+
     @DecimalMin(value = "1", message = "must be at least 1")
     double price;
 }

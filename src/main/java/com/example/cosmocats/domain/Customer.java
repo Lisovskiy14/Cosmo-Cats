@@ -7,8 +7,11 @@ import java.util.UUID;
 
 @Value
 @Builder
-public class Category {
+public class Customer {
     UUID id;
-    String name;
-    String slug;
+    String firstName;
+    String lastName;
+    String email;
+    String phoneNumber;
+    Address address;
 }

@@ -7,8 +7,9 @@ import java.util.UUID;
 
 @Value
 @Builder
-public class Category {
+public class OrderItem {
     UUID id;
-    String name;
-    String slug;
+    Order order;
+    Product product;
+    int quantity;
 }

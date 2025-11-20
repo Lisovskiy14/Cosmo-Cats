@@ -1,15 +1,17 @@
 package com.example.cosmocats.domain;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
-@Data
+@Value
 @Builder
 public class Product {
-    private UUID id;
-    private String name;
-    private String description;
-    private double price;
+    UUID id;
+    String name;
+    String description;
+    Category category;
+    BigDecimal price;
 }

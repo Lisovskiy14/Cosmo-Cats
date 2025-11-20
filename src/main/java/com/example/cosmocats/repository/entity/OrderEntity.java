@@ -41,5 +41,5 @@ public class OrderEntity {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<OrderItemEntity> entries;
+    private List<OrderItemEntity> items;
 }
