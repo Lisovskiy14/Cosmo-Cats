@@ -1,4 +1,4 @@
-package com.example.cosmocats.service.exception;
+package com.example.cosmocats.service.exception.notFound;
 
 import java.util.UUID;
 

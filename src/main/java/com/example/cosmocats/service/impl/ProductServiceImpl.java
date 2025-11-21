@@ -9,8 +9,8 @@ import com.example.cosmocats.repository.entity.CategoryEntity;
 import com.example.cosmocats.repository.entity.ProductEntity;
 import com.example.cosmocats.service.CategoryService;
 import com.example.cosmocats.service.ProductService;
-import com.example.cosmocats.service.exception.ProductNameAlreadyExistsException;
-import com.example.cosmocats.service.exception.ProductNotFoundException;
+import com.example.cosmocats.service.exception.conflict.ProductNameAlreadyExistsException;
+import com.example.cosmocats.service.exception.notFound.ProductNotFoundException;
 import com.example.cosmocats.service.mapper.CategoryEntityMapper;
 import com.example.cosmocats.service.mapper.ProductEntityMapper;
 import lombok.RequiredArgsConstructor;
@@ -69,7 +69,7 @@ public class ProductServiceImpl implements ProductService {
             );
         }
 
-        log.info("New product with id {} has been saved", savedProductEntity.getId());
+        log.info("New product with id '{}' has been saved", savedProductEntity.getId());
         return productEntityMapper.toProduct(savedProductEntity);
     }
 
@@ -90,7 +90,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
         ProductEntity updatedProductEntity = productRepository.save(productEntity);
-        log.info("Product with id {} has been updated", id);
+        log.info("Product with id '{}' has been updated", id);
         return productEntityMapper.toProduct(updatedProductEntity);
     }
 
@@ -98,6 +98,6 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public void deleteProductById(UUID id) {
         productRepository.deleteById(id);
-        log.info("Product with id {} has been deleted", id);
+        log.info("Product with id '{}' has been deleted", id);
     }
 }

@@ -5,7 +5,7 @@ import com.example.cosmocats.domain.Product;
 import com.example.cosmocats.dto.product.ProductRequestDto;
 import com.example.cosmocats.service.ProductService;
 import com.example.cosmocats.service.repository.ProductRepository;
-import com.example.cosmocats.web.mapper.ProductMapper;
+import com.example.cosmocats.web.mapper.ProductWebMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.SneakyThrows;
@@ -13,16 +13,10 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -48,7 +42,7 @@ public class ProductControllerIT extends AbstractIT {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private ProductMapper productMapper;
+    private ProductWebMapper productWebMapper;
 
     @MockitoSpyBean
     private ProductService productService;
@@ -116,7 +110,7 @@ public class ProductControllerIT extends AbstractIT {
     @SneakyThrows
     @DisplayName("Should Get All Products Test")
     public void shouldGetAllProducts() {
-        Product product = productMapper.toProduct(PRODUCT_REQUEST_DTO);
+        Product product = productWebMapper.toProduct(PRODUCT_REQUEST_DTO);
         product.setId(UUID.randomUUID());
 
         when(productService.getAllProducts()).thenReturn(List.of(product));
@@ -135,7 +129,7 @@ public class ProductControllerIT extends AbstractIT {
     @SneakyThrows
     @DisplayName("Should Get Product By Id Test")
     public void shouldGetProductById() {
-        Product product = productMapper.toProduct(PRODUCT_REQUEST_DTO);
+        Product product = productWebMapper.toProduct(PRODUCT_REQUEST_DTO);
         product.setId(UUID.randomUUID());
 
         doReturn(true).when(productRepository).existsById(product.getId());

@@ -4,15 +4,17 @@ import com.example.cosmocats.domain.Category;
 import com.example.cosmocats.repository.CategoryRepository;
 import com.example.cosmocats.repository.entity.CategoryEntity;
 import com.example.cosmocats.service.CategoryService;
-import com.example.cosmocats.service.exception.CategoryNotFoundException;
+import com.example.cosmocats.service.exception.notFound.CategoryNotFoundException;
 import com.example.cosmocats.service.mapper.CategoryEntityMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
@@ -36,6 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Category getCategoryByName(String name) {
         CategoryEntity categoryEntity = categoryRepository.findByName(name)
                 .orElseThrow(() -> new CategoryNotFoundException(name));
@@ -46,13 +49,15 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public Category saveCategory(Category category) {
         CategoryEntity categoryEntity = categoryEntityMapper.toCategoryEntity(category);
-        return categoryEntityMapper.toCategory(
-                categoryRepository.save(categoryEntity));
+        CategoryEntity savedCategoryEntity = categoryRepository.save(categoryEntity);
+        log.info("New category with id '{}' has been saved", savedCategoryEntity.getId());
+        return categoryEntityMapper.toCategory(savedCategoryEntity);
     }
 
     @Override
     @Transactional
     public void deleteCategoryById(UUID id) {
         categoryRepository.deleteById(id);
+        log.info("Category with id '{}' has been deleted", id);
     }
 }

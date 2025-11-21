@@ -3,7 +3,7 @@ package com.example.cosmocats.web;
 import com.example.cosmocats.featureToggle.exception.FeatureNotAvailableException;
 import com.example.cosmocats.util.ProductValidationUtil;
 import com.example.cosmocats.web.exception.ParamsValidationDetails;
-import com.example.cosmocats.service.exception.ProductNotFoundException;
+import com.example.cosmocats.service.exception.notFound.ProductNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;

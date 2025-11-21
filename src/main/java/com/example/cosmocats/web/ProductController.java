@@ -5,7 +5,7 @@ import com.example.cosmocats.dto.product.ProductRequestDto;
 import com.example.cosmocats.dto.product.ProductDto;
 import com.example.cosmocats.dto.product.ProductListDto;
 import com.example.cosmocats.dto.product.UpdateProductRequestDto;
-import com.example.cosmocats.web.mapper.ProductMapper;
+import com.example.cosmocats.web.mapper.ProductWebMapper;
 import com.example.cosmocats.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
-    private final ProductMapper productMapper;
+    private final ProductWebMapper productWebMapper;
 
     @GetMapping
     public ResponseEntity<ProductListDto> getAllProducts() {
@@ -31,7 +31,7 @@ public class ProductController {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ProductListDto(
                         productService.getAllProducts().stream()
-                                .map(productMapper::toProductDto)
+                                .map(productWebMapper::toProductDto)
                                 .collect(Collectors.toList()))
                 );
     }
@@ -40,7 +40,7 @@ public class ProductController {
     public ResponseEntity<ProductDto> getProductById(@PathVariable UUID id) {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(productMapper
+                .body(productWebMapper
                         .toProductDto(productService.getProductById(id))
                 );
     }
@@ -50,7 +50,7 @@ public class ProductController {
         Product savedProduct = productService.createProduct(productRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(productMapper.toProductDto(savedProduct));
+                .body(productWebMapper.toProductDto(savedProduct));
     }
 
     @PutMapping("/{productId}")
@@ -60,7 +60,7 @@ public class ProductController {
     ) {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(productMapper.toProductDto(
+                .body(productWebMapper.toProductDto(
                         productService.updateProduct(productId, updateProductRequestDto)));
     }
 

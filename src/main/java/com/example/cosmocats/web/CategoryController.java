@@ -1,6 +1,7 @@
 package com.example.cosmocats.web;
 
 import com.example.cosmocats.domain.Category;
+import com.example.cosmocats.dto.category.CategoryDto;
 import com.example.cosmocats.dto.category.CategoryListDto;
 import com.example.cosmocats.dto.category.CategoryRequestDto;
 import com.example.cosmocats.service.CategoryService;
@@ -15,14 +16,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/category")
+@RequestMapping("/api/v1/categories")
 @RequiredArgsConstructor
 public class CategoryController {
     private final CategoryService categoryService;
     private final CategoryWebMapper categoryWebMapper;
 
     @GetMapping
-    public ResponseEntity<Object> getAllCategories() {
+    public ResponseEntity<CategoryListDto> getAllCategories() {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new CategoryListDto(
@@ -32,7 +33,7 @@ public class CategoryController {
     }
 
     @GetMapping("/{categoryId}")
-    public ResponseEntity<Object> getCategoryById(@PathVariable UUID categoryId) {
+    public ResponseEntity<CategoryDto> getCategoryById(@PathVariable UUID categoryId) {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(categoryWebMapper.toCategoryDto(
@@ -40,7 +41,7 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> saveCategory(@RequestBody @Valid CategoryRequestDto categoryRequestDto) {
+    public ResponseEntity<CategoryDto> saveCategory(@RequestBody @Valid CategoryRequestDto categoryRequestDto) {
         Category category = categoryWebMapper.toCategory(categoryRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -49,7 +50,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{categoryId}")
-    public ResponseEntity<Object> deleteCategoryById(@PathVariable UUID categoryId) {
+    public ResponseEntity<Void> deleteCategoryById(@PathVariable UUID categoryId) {
         categoryService.deleteCategoryById(categoryId);
         return ResponseEntity.noContent()
                 .build();

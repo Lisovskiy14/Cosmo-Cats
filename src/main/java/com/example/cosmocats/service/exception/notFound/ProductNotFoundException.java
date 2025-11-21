@@ -1,7 +1,7 @@
-package com.example.cosmocats.service.exception;
+package com.example.cosmocats.service.exception.notFound;
 
 
-public class ProductNotFoundException extends RuntimeException {
+public class ProductNotFoundException extends ResourceNotFoundException {
     private static final String PRODUCT_WITH_ID_NOT_FOUND = "Product with id '%s' not found";
 
     public ProductNotFoundException(String id) {

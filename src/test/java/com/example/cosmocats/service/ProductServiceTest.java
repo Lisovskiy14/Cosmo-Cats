@@ -2,7 +2,7 @@ package com.example.cosmocats.service;
 
 import com.example.cosmocats.domain.Product;
 import com.example.cosmocats.repository.ProductRepository;
-import com.example.cosmocats.service.exception.ProductNotFoundException;
+import com.example.cosmocats.service.exception.notFound.ProductNotFoundException;
 import com.example.cosmocats.service.impl.ProductServiceImpl;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
