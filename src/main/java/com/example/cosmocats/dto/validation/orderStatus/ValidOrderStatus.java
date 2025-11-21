@@ -1,4 +1,4 @@
-package com.example.cosmocats.dto.validation;
+package com.example.cosmocats.dto.validation.orderStatus;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -8,11 +8,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Constraint(validatedBy = CosmicWordValidator.class)
-@Target(ElementType.FIELD)
+@Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface CosmicWordCheck {
-    String message() default "must contain at least one cosmic word (e.g. 'cosmo', 'galaxy', 'star', 'comet')";
+@Constraint(validatedBy = OrderStatusValidator.class)
+public @interface ValidOrderStatus {
+    String message() default "Invalid order status";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

@@ -1,6 +1,6 @@
 package com.example.cosmocats.dto.product;
 
-import com.example.cosmocats.dto.validation.CosmicWordCheck;
+import com.example.cosmocats.dto.validation.cosmicWord.CosmicWordCheck;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;

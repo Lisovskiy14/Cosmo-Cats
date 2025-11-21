@@ -36,12 +36,12 @@ public class ProductController {
                 );
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProductDto> getProductById(@PathVariable UUID id) {
+    @GetMapping("/{productId}")
+    public ResponseEntity<ProductDto> getProductById(@PathVariable UUID productId) {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(productWebMapper
-                        .toProductDto(productService.getProductById(id))
+                        .toProductDto(productService.getProductById(productId))
                 );
     }
 
@@ -64,9 +64,9 @@ public class ProductController {
                         productService.updateProduct(productId, updateProductRequestDto)));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProductById(@PathVariable UUID id) {
-        productService.deleteProductById(id);
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<Void> deleteProductById(@PathVariable UUID productId) {
+        productService.deleteProductById(productId);
         return ResponseEntity.noContent()
                 .build();
     }

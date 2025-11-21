@@ -1,4 +1,4 @@
-package com.example.cosmocats.dto.validation;
+package com.example.cosmocats.dto.validation.cosmicWord;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

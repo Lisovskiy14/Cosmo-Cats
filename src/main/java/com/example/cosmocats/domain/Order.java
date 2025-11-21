@@ -18,9 +18,9 @@ public class Order {
     BigDecimal totalPrice;
     OrderStatus status;
     LocalDateTime createdAt;
-    List<OrderItem> items = new ArrayList<>();
+    List<OrderItem> items;
 
-    void calculateTotalPrice() {
+    public void calculateTotalPrice() {
         this.totalPrice = items.stream()
                 .map((item) -> item
                         .getProduct().getPrice()
