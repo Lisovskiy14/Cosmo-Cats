@@ -4,8 +4,10 @@ import com.example.cosmocats.domain.Order;
 import com.example.cosmocats.domain.OrderItem;
 import com.example.cosmocats.repository.entity.OrderEntity;
 import com.example.cosmocats.repository.entity.OrderItemEntity;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 @Mapper(
         componentModel = "spring",
@@ -20,4 +22,11 @@ public interface OrderEntityMapper {
 
     @Mapping(target = "order", ignore = true)
     OrderItemEntity toOrderItemEntity(OrderItem orderItem);
+
+    @AfterMapping
+    default void linkOrderToItems(@MappingTarget OrderEntity orderEntity) {
+        if (orderEntity.getItems() != null) {
+            orderEntity.getItems().forEach(item -> item.setOrder(orderEntity));
+        }
+    }
 }

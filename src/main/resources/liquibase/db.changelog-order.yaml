@@ -15,6 +15,11 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
               - column:
+                  name: order_number
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
                   name: customer_id
                   type: UUID
                   constraints:
@@ -35,6 +40,10 @@ databaseChangeLog:
                   constraints:
                     nullable: false
 
+        - addUniqueConstraint:
+            tableName: orders
+            columnNames: order_number
+            constraintName: uq_orders_order_number
         - addForeignKeyConstraint:
             baseTableName: orders
             baseColumnNames: customer_id

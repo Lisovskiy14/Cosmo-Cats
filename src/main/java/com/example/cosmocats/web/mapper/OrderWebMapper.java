@@ -12,7 +12,6 @@ public interface OrderWebMapper {
     @Mapping(source = "customer.id", target = "customerId")
     OrderDto toOrderDto(Order order);
 
-    @Mapping(target = "order", ignore = true)
     @Mapping(source = "product.id", target = "productId")
     OrderItemDto toOrderItemDto(OrderItem orderItem);
 }

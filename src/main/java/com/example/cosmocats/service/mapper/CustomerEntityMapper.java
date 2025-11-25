@@ -6,13 +6,15 @@ import com.example.cosmocats.repository.entity.AddressEntity;
 import com.example.cosmocats.repository.entity.CustomerEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring")
 public interface CustomerEntityMapper {
     @Mapping(target = "address", source = "address", qualifiedByName = "addressEntityToAddress")
     Customer toCustomer(CustomerEntity customerEntity);
 
-    private Address addressEntityToAddress(AddressEntity addressEntity) {
+    @Named("addressEntityToAddress")
+    default Address addressEntityToAddress(AddressEntity addressEntity) {
         return Address.builder()
                 .country(addressEntity.getCountry())
                 .city(addressEntity.getCity())

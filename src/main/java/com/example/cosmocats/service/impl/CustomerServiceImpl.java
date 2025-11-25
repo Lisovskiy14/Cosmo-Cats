@@ -62,16 +62,18 @@ public class CustomerServiceImpl implements CustomerService {
                 .lastName(customerRequestDto.getLastName())
                 .email(customerRequestDto.getEmail())
                 .phoneNumber(customerRequestDto.getPhoneNumber())
-                .address(
-                        AddressEntity.builder()
-                                .country(customerRequestDto.getAddress().getCountry())
-                                .city(customerRequestDto.getAddress().getCity())
-                                .street(customerRequestDto.getAddress().getStreet())
-                                .house(customerRequestDto.getAddress().getHouse())
-                                .apartment(customerRequestDto.getAddress().getApartment())
-                                .build()
-                )
                 .build();
+
+        customerEntity.setAddress(
+                AddressEntity.builder()
+                        .customer(customerEntity)
+                        .country(customerRequestDto.getAddress().getCountry())
+                        .city(customerRequestDto.getAddress().getCity())
+                        .street(customerRequestDto.getAddress().getStreet())
+                        .house(customerRequestDto.getAddress().getHouse())
+                        .apartment(customerRequestDto.getAddress().getApartment())
+                        .build()
+        );
 
         CustomerEntity savedCustomerEntity = customerRepository.save(customerEntity);
         log.info("New customer with id '{}' has been created", savedCustomerEntity.getId());

@@ -1,9 +1,7 @@
 package com.example.cosmocats.dto.customer;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import lombok.Value;
 
 @Value
@@ -28,6 +26,7 @@ public class CustomerRequestDto {
     )
     String phoneNumber;
 
-    @NotBlank(message = "is required")
+    @NotNull(message = "is required")
+    @Valid
     AddressRequestDto address;
 }

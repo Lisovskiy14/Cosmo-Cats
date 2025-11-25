@@ -70,8 +70,8 @@ databaseChangeLog:
                   type: VARCHAR(10)
 
         - addForeignKeyConstraint:
-            baseTableName: customers
-            baseColumnNames: id
-            referencedTableName: customer_addresses
-            referencedColumnNames: customer_id
-            constraintName: fk_customers_address_id
+            baseTableName: customer_addresses
+            baseColumnNames: customer_id
+            referencedTableName: customers
+            referencedColumnNames: id
+            constraintName: fk_addresses_customer_id

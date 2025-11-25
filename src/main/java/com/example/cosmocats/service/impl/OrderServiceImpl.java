@@ -1,7 +1,6 @@
 package com.example.cosmocats.service.impl;
 
 import com.example.cosmocats.common.OrderStatus;
-import com.example.cosmocats.domain.Customer;
 import com.example.cosmocats.domain.Order;
 import com.example.cosmocats.domain.OrderItem;
 import com.example.cosmocats.domain.Product;
@@ -11,7 +10,6 @@ import com.example.cosmocats.repository.CustomerRepository;
 import com.example.cosmocats.repository.OrderRepository;
 import com.example.cosmocats.repository.ProductRepository;
 import com.example.cosmocats.repository.entity.OrderEntity;
-import com.example.cosmocats.service.CustomerService;
 import com.example.cosmocats.service.OrderService;
 import com.example.cosmocats.service.exception.notFound.CustomerNotFoundException;
 import com.example.cosmocats.service.exception.notFound.OrderNotFoundException;
@@ -59,8 +57,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public Order getOrderById(UUID id) {
-        return orderEntityMapper.toOrder(findOrderEntityById(id));
+    public Order getOrderByNaturalId(String orderNumber) {
+        return orderEntityMapper.toOrder(findOrderEntityByNaturalId(orderNumber));
     }
 
     @Override
@@ -80,8 +78,6 @@ public class OrderServiceImpl implements OrderService {
                 .collect(Collectors.toMap(Product::getId, product -> product));
 
         Order order = Order.builder()
-                .customer(customerEntityMapper.toCustomer(
-                        customerRepository.getReferenceById(customerId)))
                 .status(OrderStatus.CREATED)
                 .build();
 
@@ -103,34 +99,36 @@ public class OrderServiceImpl implements OrderService {
         order.setItems(orderItems);
         order.calculateTotalPrice();
 
-        OrderEntity savedOrderEntity = orderRepository.save(orderEntityMapper.toOrderEntity(order));
+        OrderEntity orderEntity = orderEntityMapper.toOrderEntity(order);
+        orderEntity.setCustomer(customerRepository.getReferenceById(customerId));
+
+        OrderEntity savedOrderEntity = orderRepository.save(orderEntity);
         log.info("New order with id '{}' has been created", savedOrderEntity.getId());
         return orderEntityMapper.toOrder(savedOrderEntity);
     }
 
     @Override
     @Transactional
-    public Order updateOrderStatus(UpdateOrderStatusRequestDto updateOrderStatusRequestDto) {
-        UUID orderId = UUID.fromString(updateOrderStatusRequestDto.getOrderId());
-        OrderEntity orderEntity = findOrderEntityById(orderId);
+    public Order updateOrderStatus(String orderNumber, UpdateOrderStatusRequestDto updateOrderStatusRequestDto) {
+        OrderEntity orderEntity = findOrderEntityByNaturalId(orderNumber);
 
         OrderStatus newStatus = OrderStatus.valueOf(updateOrderStatusRequestDto.getStatus());
         orderEntity.setStatus(newStatus);
 
         OrderEntity updatedOrderEntity = orderRepository.save(orderEntity);
-        log.info("Order with id '{}' has been updated to status '{}'", orderId, newStatus);
+        log.info("Order with id '{}' has been updated to status '{}'", orderNumber, newStatus);
         return orderEntityMapper.toOrder(updatedOrderEntity);
     }
 
     @Override
     @Transactional
-    public void deleteOrderById(UUID id) {
-        orderRepository.deleteById(id);
-        log.info("Order with id '{}' has been deleted", id);
+    public void deleteOrderByNaturalId(String orderNumber) {
+        orderRepository.deleteByNaturalId(orderNumber);
+        log.info("Order with id '{}' has been deleted", orderNumber);
     }
 
-    private OrderEntity findOrderEntityById(UUID id) {
-        return orderRepository.findById(id)
-                .orElseThrow(() -> new OrderNotFoundException(id.toString()));
+    private OrderEntity findOrderEntityByNaturalId(String orderNumber) {
+        return orderRepository.findByNaturalId(orderNumber)
+                .orElseThrow(() -> new OrderNotFoundException(orderNumber));
     }
 }

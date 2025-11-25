@@ -19,7 +19,7 @@ public class CategoryRequestDto {
     @NotBlank(message = "is required")
     @Size(min = 3, max = 20, message = "must be between 3 and 20 characters long")
     @Pattern(
-            regexp = "^[a-zA-Z0-9-]+$",
+            regexp = "^[a-z0-9-]+$",
             message = "must contain only letters, numbers and dashes"
     )
     String slug;

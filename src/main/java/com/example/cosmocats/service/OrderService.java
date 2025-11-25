@@ -10,8 +10,8 @@ import java.util.UUID;
 public interface OrderService {
     List<Order> getAllOrders();
     List<Order> getAllOrdersByCustomerId(UUID id);
-    Order getOrderById(UUID id);
+    Order getOrderByNaturalId(String id);
     Order placeOrder(OrderRequestDto orderRequestDto);
-    Order updateOrderStatus(UpdateOrderStatusRequestDto updateOrderStatusRequestDto);
-    void deleteOrderById(UUID id);
+    Order updateOrderStatus(String orderNumber, UpdateOrderStatusRequestDto updateOrderStatusRequestDto);
+    void deleteOrderByNaturalId(String id);
 }

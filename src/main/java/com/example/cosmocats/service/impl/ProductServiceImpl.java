@@ -61,7 +61,7 @@ public class ProductServiceImpl implements ProductService {
 
         ProductEntity savedProductEntity = null;
         try {
-            savedProductEntity = productRepository.save(productEntity);
+            savedProductEntity = productRepository.saveAndFlush(productEntity);
         } catch (DataIntegrityViolationException ex) {
             throw new ProductNameAlreadyExistsException(
                     productEntity.getName(),
