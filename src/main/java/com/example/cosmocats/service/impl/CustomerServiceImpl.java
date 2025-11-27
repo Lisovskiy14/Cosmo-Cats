@@ -5,6 +5,7 @@ import com.example.cosmocats.dto.customer.CustomerRequestDto;
 import com.example.cosmocats.repository.CustomerRepository;
 import com.example.cosmocats.repository.entity.AddressEntity;
 import com.example.cosmocats.repository.entity.CustomerEntity;
+import com.example.cosmocats.repository.projection.CustomerDetailsProjection;
 import com.example.cosmocats.service.CustomerService;
 import com.example.cosmocats.service.exception.conflict.CustomerEmailAlreadyExistsException;
 import com.example.cosmocats.service.exception.conflict.CustomerPhoneNumberAlreadyExistsException;
@@ -27,10 +28,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Customer> getAllCustomers() {
-        return customerRepository.findAll().stream()
-                .map(customerEntityMapper::toCustomer)
-                .toList();
+    public List<CustomerDetailsProjection> getAllCustomers() {
+        return customerRepository.findAllBy();
     }
 
     @Override

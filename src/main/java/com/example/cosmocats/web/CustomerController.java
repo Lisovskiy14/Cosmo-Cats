@@ -3,6 +3,7 @@ package com.example.cosmocats.web;
 import com.example.cosmocats.dto.customer.CustomerDto;
 import com.example.cosmocats.dto.customer.CustomerListDto;
 import com.example.cosmocats.dto.customer.CustomerRequestDto;
+import com.example.cosmocats.repository.projection.CustomerDetailsProjection;
 import com.example.cosmocats.service.CustomerService;
 import com.example.cosmocats.web.mapper.CustomerWebMapper;
 import jakarta.validation.Valid;
@@ -26,11 +27,7 @@ public class CustomerController {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new CustomerListDto(
-                        customerService.getAllCustomers().stream()
-                                .map(customerWebMapper::toCustomerDto)
-                                .toList()
-                        )
-                );
+                        customerService.getAllCustomers()));
     }
 
     @GetMapping("/{customerId}")
