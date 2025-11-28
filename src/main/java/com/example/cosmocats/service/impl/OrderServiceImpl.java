@@ -35,7 +35,6 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderEntityMapper orderEntityMapper;
     private final CustomerRepository customerRepository;
-    private final CustomerEntityMapper customerEntityMapper;
     private final ProductRepository productRepository;
     private final ProductEntityMapper productEntityMapper;
 
@@ -43,6 +42,14 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public List<Order> getAllOrders() {
         return orderRepository.findAll().stream()
+                .map(orderEntityMapper::toOrder)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Order> getAllOrdersByStatus(OrderStatus orderStatus) {
+        return orderRepository.findAllByOrderStatus(orderStatus).stream()
                 .map(orderEntityMapper::toOrder)
                 .toList();
     }

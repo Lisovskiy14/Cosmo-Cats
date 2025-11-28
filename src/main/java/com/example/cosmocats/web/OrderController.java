@@ -1,11 +1,13 @@
 package com.example.cosmocats.web;
 
+import com.example.cosmocats.common.OrderStatus;
 import com.example.cosmocats.domain.Order;
 import com.example.cosmocats.dto.order.OrderDto;
 import com.example.cosmocats.dto.order.OrderListDto;
 import com.example.cosmocats.dto.order.OrderRequestDto;
 import com.example.cosmocats.dto.order.UpdateOrderStatusRequestDto;
 import com.example.cosmocats.dto.validation.orderNumber.ValidOrderNumber;
+import com.example.cosmocats.dto.validation.orderStatus.ValidOrderStatus;
 import com.example.cosmocats.service.OrderService;
 import com.example.cosmocats.web.mapper.OrderWebMapper;
 import lombok.RequiredArgsConstructor;
@@ -28,11 +30,14 @@ public class OrderController {
 
     @GetMapping
     public ResponseEntity<OrderListDto> getAllOrders(
-            @RequestParam(name = "customerId", required = false) UUID customerId
+            @RequestParam(name = "customerId", required = false) UUID customerId,
+            @RequestParam(name = "status", required = false) OrderStatus orderStatus
     ) {
         List<Order> orders;
         if (customerId != null) {
             orders = orderService.getAllOrdersByCustomerId(customerId);
+        } else if (orderStatus != null) {
+            orders = orderService.getAllOrdersByStatus(orderStatus);
         } else {
             orders = orderService.getAllOrders();
         }
