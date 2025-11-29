@@ -1,9 +1,15 @@
 package com.example.cosmocats.service;
 
 import com.example.cosmocats.domain.Product;
+import com.example.cosmocats.dto.product.ProductRequestDto;
 import com.example.cosmocats.repository.ProductRepository;
+import com.example.cosmocats.repository.entity.CategoryEntity;
+import com.example.cosmocats.repository.entity.ProductEntity;
 import com.example.cosmocats.service.exception.notFound.ProductNotFoundException;
 import com.example.cosmocats.service.impl.ProductServiceImpl;
+import com.example.cosmocats.service.mapper.CategoryEntityMapper;
+import com.example.cosmocats.service.mapper.CategoryEntityMapperImpl;
+import com.example.cosmocats.service.mapper.ProductEntityMapperImpl;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -13,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -24,58 +31,85 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = {ProductServiceImpl.class})
+@SpringBootTest(classes = {ProductServiceImpl.class, ProductEntityMapperImpl.class, CategoryEntityMapperImpl.class})
 @DisplayName("Product Service Tests")
 public class ProductServiceTest {
 
     @Autowired
     private ProductService productService;
+
     @MockitoBean
     private ProductRepository productRepository;
 
+    @MockitoBean
+    private CategoryService categoryService;
+
     @Captor
-    private ArgumentCaptor<Product> productArgumentCaptor;
+    private ArgumentCaptor<ProductEntity> productArgumentCaptor;
 
 
-    public static Stream<Product> provideProducts() {
+    public static Stream<ProductRequestDto> provideProductRequests() {
         return Stream.of(
-                buildProduct("Product 1", "Some description 1", 100),
-                buildProduct("Product 2", "Some description 2", 200),
-                buildProduct("Product 3", "Some description 3", 300),
-                buildProduct("Product 4", "Some description 4", 400)
+                buildProductRequest("Product 1", "Some description 1", BigDecimal.valueOf(100)),
+                buildProductRequest("Product 2", "Some description 2", BigDecimal.valueOf(200)),
+                buildProductRequest("Product 3", "Some description 3", BigDecimal.valueOf(300)),
+                buildProductRequest("Product 4", "Some description 4", BigDecimal.valueOf(400))
         );
     }
 
     @ParameterizedTest
-    @MethodSource("provideProducts")
+    @MethodSource("provideProductRequests")
     @DisplayName("Parameterized Save Product Test")
-    public void shouldSaveProduct(Product product) {
-        when(productRepository.save(productArgumentCaptor.capture()))
-                .thenAnswer(inv -> inv.getArgument(0));
+    public void shouldSaveProduct(ProductRequestDto productRequestDto) {
+        when(productRepository.saveAndFlush(any(ProductEntity.class)))
+                .thenReturn(ProductEntity.builder()
+                        .id(UUID.randomUUID())
+                        .name(productRequestDto.getName())
+                        .description(productRequestDto.getDescription())
+                        .price(productRequestDto.getPrice())
+                        .category(CategoryEntity.builder()
+                                .id(UUID.randomUUID())
+                                .name(productRequestDto.getCategoryName())
+                                .build())
+                        .build());
 
-        Product savedProduct = productService.createProduct(product);
+        Product savedProduct = productService.createProduct(productRequestDto);
 
-        verify(productRepository, times(1)).save(any(Product.class));
-        assertThatNoException().isThrownBy(() -> productService.createProduct(product));
+        verify(productRepository, times(1)).saveAndFlush(any(ProductEntity.class));
+        assertThatNoException().isThrownBy(() -> productService.createProduct(productRequestDto));
 
         assertThat(savedProduct).isNotNull();
-        assertThat(savedProduct.getId()).isEqualTo(product.getId());
-        assertThat(savedProduct.getName()).isEqualTo(product.getName());
-        assertThat(savedProduct.getDescription()).isEqualTo(product.getDescription());
-        assertThat(savedProduct.getPrice()).isEqualTo(product.getPrice());
+        assertThat(savedProduct.getId()).isNotNull();
+        assertThat(savedProduct.getName()).isEqualTo(productRequestDto.getName());
+        assertThat(savedProduct.getDescription()).isEqualTo(productRequestDto.getDescription());
+        assertThat(savedProduct.getCategory()).isNotNull();
+        assertThat(savedProduct.getPrice()).isEqualTo(productRequestDto.getPrice());
     }
 
     @Test
     @DisplayName("Get All Products Test")
     public void shouldGetAllProducts() {
-        List<Product> products = provideProducts().toList();
-        when(productRepository.findAll()).thenReturn(products);
+        List<ProductEntity> productEntities = List.of(
+                ProductEntity.builder()
+                        .id(UUID.randomUUID())
+                        .name("Product 1")
+                        .description("Some description 1")
+                        .price(BigDecimal.valueOf(100))
+                        .build(),
+                ProductEntity.builder()
+                        .id(UUID.randomUUID())
+                        .name("Product 2")
+                        .description("Some description 2")
+                        .price(BigDecimal.valueOf(200))
+                        .build()
+        );
+        when(productRepository.findAll()).thenReturn(productEntities);
 
         List<Product> foundProducts = productService.getAllProducts();
 
         verify(productRepository, times(1)).findAll();
         assertThat(foundProducts).isNotNull();
-        assertEquals(products.size(), foundProducts.size());
+        assertEquals(productEntities.size(), foundProducts.size());
     }
 
     @Test
@@ -87,13 +121,10 @@ public class ProductServiceTest {
     @Test
     @DisplayName("Delete Products Test")
     public void shouldDeleteProducts() {
-        List<UUID> productIds = provideProducts().map(Product::getId).toList();
+        UUID productId = UUID.randomUUID();
 
-        productIds.forEach(id -> {productService.deleteProductById(id);});
-        int postLength = productService.getAllProducts().size();
-
-        assertEquals(0, postLength);
-        verify(productRepository, times(4)).deleteById(any(UUID.class));
+        assertThatNoException().isThrownBy(() -> productService.deleteProductById(productId));
+        verify(productRepository, times(1)).deleteById(any(UUID.class));
     }
 
     @Test
@@ -102,11 +133,11 @@ public class ProductServiceTest {
         assertThatNoException().isThrownBy(() -> productService.deleteProductById(UUID.randomUUID()));
     }
 
-    private static Product buildProduct(String name, String description, double price) {
-        return Product.builder()
-                .id(UUID.randomUUID())
+    private static ProductRequestDto buildProductRequest(String name, String description, BigDecimal price) {
+        return ProductRequestDto.builder()
                 .name(name)
                 .description(description)
+                .categoryName("Category 1")
                 .price(price)
                 .build();
     }

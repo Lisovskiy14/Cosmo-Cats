@@ -1,10 +1,17 @@
 package com.example.cosmocats.web;
 
 import com.example.cosmocats.AbstractIT;
+import com.example.cosmocats.domain.Category;
 import com.example.cosmocats.domain.Product;
+import com.example.cosmocats.dto.category.CategoryRequestDto;
 import com.example.cosmocats.dto.product.ProductRequestDto;
+import com.example.cosmocats.dto.product.UpdateProductRequestDto;
+import com.example.cosmocats.repository.ProductRepository;
+import com.example.cosmocats.repository.entity.CategoryEntity;
+import com.example.cosmocats.repository.entity.ProductEntity;
+import com.example.cosmocats.service.CategoryService;
 import com.example.cosmocats.service.ProductService;
-import com.example.cosmocats.service.repository.ProductRepository;
+import com.example.cosmocats.service.mapper.ProductEntityMapper;
 import com.example.cosmocats.web.mapper.ProductWebMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -12,11 +19,14 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -33,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Tag("product-service")
 public class ProductControllerIT extends AbstractIT {
 
-    private final ProductRequestDto PRODUCT_REQUEST_DTO = buildProductRequestDto("Galaxy product", 100);
+    private final ProductRequestDto PRODUCT_REQUEST_DTO = buildProductRequestDto("Galaxy product", BigDecimal.valueOf(100));
 
     @Autowired
     private MockMvc mockMvc;
@@ -44,8 +54,14 @@ public class ProductControllerIT extends AbstractIT {
     @Autowired
     private ProductWebMapper productWebMapper;
 
+    @Autowired
+    private ProductEntityMapper productEntityMapper;
+
     @MockitoSpyBean
     private ProductService productService;
+
+    @MockitoSpyBean
+    private CategoryService categoryService;
 
     @MockitoSpyBean
     private ProductRepository productRepository;
@@ -60,6 +76,19 @@ public class ProductControllerIT extends AbstractIT {
     @SneakyThrows
     @DisplayName("Should Create Product Test")
     public void shouldCreateProduct() {
+        doReturn(Category.builder()
+                .id(UUID.randomUUID())
+                .name("Category 1")
+                .slug("category-1")
+                .build()).when(categoryService).getCategoryByName(any());
+
+        doReturn(ProductEntity.builder()
+                .id(UUID.randomUUID())
+                .name(PRODUCT_REQUEST_DTO.getName())
+                .description(PRODUCT_REQUEST_DTO.getDescription())
+                .price(PRODUCT_REQUEST_DTO.getPrice())
+                .build()).when(productRepository).saveAndFlush(any());
+
         mockMvc.perform(post("/api/v1/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
@@ -76,9 +105,9 @@ public class ProductControllerIT extends AbstractIT {
     @DisplayName("Should Return 400 Validation Error Response")
     public void shouldThrowValidationException() {
         mockMvc.perform(post("/api/v1/products")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(buildProductRequestDto("wrong product", 100))))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(buildProductRequestDto("wrong product", BigDecimal.valueOf(100)))))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.type").value("urn:problem-type:validation-error"))
                 .andExpect(jsonPath("$.title").value("Failed Validation Exception"))
@@ -90,9 +119,14 @@ public class ProductControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
-    @DisplayName("Should Return Conflict On Product Id Response")
+    @DisplayName("Should Return Conflict On Product Name Response")
     public void shouldReturnConflictOnProductIdResponse() {
-        doReturn(true).when(productRepository).existsById(any());
+        doThrow(DataIntegrityViolationException.class).when(productRepository).saveAndFlush(any());
+        doReturn(Category.builder()
+                .id(UUID.randomUUID())
+                .name("Category 1")
+                .slug("category-1")
+                .build()).when(categoryService).getCategoryByName(any());
 
         mockMvc.perform(post("/api/v1/products")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -100,7 +134,7 @@ public class ProductControllerIT extends AbstractIT {
                         .content(objectMapper.writeValueAsString(PRODUCT_REQUEST_DTO)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.type").value("urn:problem-type:conflict-error"))
-                .andExpect(jsonPath("$.title").value("Product Id Already Exists Exception"))
+                .andExpect(jsonPath("$.title").value("Resource Already Exists Exception"))
                 .andExpect(jsonPath("$.status").value("409"))
                 .andExpect(jsonPath("$.detail").exists())
                 .andExpect(jsonPath("$.instance").value("/api/v1/products"));
@@ -111,12 +145,14 @@ public class ProductControllerIT extends AbstractIT {
     @DisplayName("Should Get All Products Test")
     public void shouldGetAllProducts() {
         Product product = productWebMapper.toProduct(PRODUCT_REQUEST_DTO);
-        product.setId(UUID.randomUUID());
+        product = product.toBuilder()
+                .id(UUID.randomUUID())
+                .build();
 
         when(productService.getAllProducts()).thenReturn(List.of(product));
 
         mockMvc.perform(get("/api/v1/products")
-                    .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.products").isArray())
                 .andExpect(jsonPath("$.products[0].id").exists())
@@ -130,13 +166,15 @@ public class ProductControllerIT extends AbstractIT {
     @DisplayName("Should Get Product By Id Test")
     public void shouldGetProductById() {
         Product product = productWebMapper.toProduct(PRODUCT_REQUEST_DTO);
-        product.setId(UUID.randomUUID());
+        product = product.toBuilder()
+                .id(UUID.randomUUID())
+                .build();
 
-        doReturn(true).when(productRepository).existsById(product.getId());
-        doReturn(product).when(productRepository).getProductById(product.getId());
+        doReturn(Optional.of(productEntityMapper.toProductEntity(product)))
+                .when(productRepository).findById(product.getId());
 
         mockMvc.perform(get("/api/v1/products/{id}", product.getId())
-                    .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(product.getId().toString()))
                 .andExpect(jsonPath("$.name").value(product.getName()))
@@ -151,10 +189,10 @@ public class ProductControllerIT extends AbstractIT {
         UUID id = UUID.randomUUID();
 
         mockMvc.perform(get("/api/v1/products/{id}", id)
-                    .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.type").value("urn:problem-type:not-found"))
-                .andExpect(jsonPath("$.title").value("Product Not Found Exception"))
+                .andExpect(jsonPath("$.title").value("Resource Not Found Exception"))
                 .andExpect(jsonPath("$.status").value("404"))
                 .andExpect(jsonPath("$.detail").value(
                         String.format("Product with id '%s' not found",  id)))
@@ -167,9 +205,23 @@ public class ProductControllerIT extends AbstractIT {
     @DisplayName("Should Update Product Test")
     public void shouldUpdateProduct() {
         UUID id = UUID.randomUUID();
-        ProductRequestDto productRequestDto = buildProductRequestDto("Super Galaxy product", 200);
+        UpdateProductRequestDto productRequestDto = UpdateProductRequestDto.builder()
+                .price(BigDecimal.valueOf(400))
+                .build();
 
-        doReturn(true).when(productRepository).existsById(id);
+        Product productBefore = Product.builder()
+                .id(id)
+                .name("Galaxy Product")
+                .description("Some product description")
+                .price(BigDecimal.valueOf(200))
+                .build();
+        doReturn(productBefore).when(productService).getProductById(id);
+
+        ProductEntity productEntityAfter = productEntityMapper.toProductEntity(
+                productBefore.toBuilder()
+                        .price(productRequestDto.getPrice())
+                        .build());
+        doReturn(productEntityAfter).when(productRepository).save(any());
 
         mockMvc.perform(put("/api/v1/products/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -177,8 +229,8 @@ public class ProductControllerIT extends AbstractIT {
                         .content(objectMapper.writeValueAsString(productRequestDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id.toString()))
-                .andExpect(jsonPath("$.name").value(productRequestDto.getName()))
-                .andExpect(jsonPath("$.description").value(productRequestDto.getDescription()))
+                .andExpect(jsonPath("$.name").value(productBefore.getName()))
+                .andExpect(jsonPath("$.description").value(productBefore.getDescription()))
                 .andExpect(jsonPath("$.price").value(productRequestDto.getPrice()));
     }
 
@@ -214,10 +266,11 @@ public class ProductControllerIT extends AbstractIT {
                         String.format("/api/v1/products/%s", id)));
     }
 
-    private ProductRequestDto buildProductRequestDto(String name, double price) {
+    private ProductRequestDto buildProductRequestDto(String name, BigDecimal price) {
         return ProductRequestDto.builder()
                 .name(name)
                 .description("Some product description")
+                .categoryName("Category 1")
                 .price(price)
                 .build();
     }

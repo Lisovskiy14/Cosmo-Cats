@@ -3,11 +3,13 @@ package com.example.cosmocats.dto.product;
 import com.example.cosmocats.dto.validation.cosmicWord.CosmicWordCheck;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Value;
 
 import java.math.BigDecimal;
 
 @Value
+@Builder
 public class UpdateProductRequestDto {
 
     @Size(min = 3, max = 20, message = "must be between 3 and 20 characters long")

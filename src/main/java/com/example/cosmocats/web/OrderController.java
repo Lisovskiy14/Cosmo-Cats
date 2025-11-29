@@ -7,7 +7,6 @@ import com.example.cosmocats.dto.order.OrderListDto;
 import com.example.cosmocats.dto.order.OrderRequestDto;
 import com.example.cosmocats.dto.order.UpdateOrderStatusRequestDto;
 import com.example.cosmocats.dto.validation.orderNumber.ValidOrderNumber;
-import com.example.cosmocats.dto.validation.orderStatus.ValidOrderStatus;
 import com.example.cosmocats.service.OrderService;
 import com.example.cosmocats.web.mapper.OrderWebMapper;
 import lombok.RequiredArgsConstructor;
