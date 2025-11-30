@@ -3,7 +3,6 @@ package com.example.cosmocats.web;
 import com.example.cosmocats.dto.customer.CustomerDto;
 import com.example.cosmocats.dto.customer.CustomerListDto;
 import com.example.cosmocats.dto.customer.CustomerRequestDto;
-import com.example.cosmocats.repository.projection.CustomerDetailsProjection;
 import com.example.cosmocats.service.CustomerService;
 import com.example.cosmocats.web.mapper.CustomerWebMapper;
 import jakarta.validation.Valid;

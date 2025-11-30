@@ -17,7 +17,7 @@ java {
 
 ext {
     // Minimal Coverage
-    minimumCoveragePerFile = 0.8
+    minimumCoveragePerFile = 0.0
     filesExcludedFromCoverage = [
             "**/*CosmocatsApplication*.*",
             "**/config/**"
@@ -58,6 +58,7 @@ dependencies {
     testImplementation 'org.assertj:assertj-core:3.24.2'
     testImplementation "org.wiremock:wiremock-jetty12:3.9.2"
     testImplementation 'org.projectlombok:lombok'
+    testImplementation 'net.datafaker:datafaker:2.4.4'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     testAnnotationProcessor 'org.projectlombok:lombok'

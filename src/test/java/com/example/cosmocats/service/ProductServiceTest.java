@@ -7,7 +7,6 @@ import com.example.cosmocats.repository.entity.CategoryEntity;
 import com.example.cosmocats.repository.entity.ProductEntity;
 import com.example.cosmocats.service.exception.notFound.ProductNotFoundException;
 import com.example.cosmocats.service.impl.ProductServiceImpl;
-import com.example.cosmocats.service.mapper.CategoryEntityMapper;
 import com.example.cosmocats.service.mapper.CategoryEntityMapperImpl;
 import com.example.cosmocats.service.mapper.ProductEntityMapperImpl;
 import org.junit.jupiter.api.*;

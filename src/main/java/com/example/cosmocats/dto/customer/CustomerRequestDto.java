@@ -2,9 +2,11 @@ package com.example.cosmocats.dto.customer;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
+import lombok.Builder;
 import lombok.Value;
 
 @Value
+@Builder(toBuilder = true)
 public class CustomerRequestDto {
 
     @NotBlank(message = "is required")
