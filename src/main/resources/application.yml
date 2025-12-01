@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: cosmocats
+
+application:
+  features:
+    toggles:
+      greeting: true

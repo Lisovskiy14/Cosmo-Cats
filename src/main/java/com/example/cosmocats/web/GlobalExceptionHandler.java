@@ -1,5 +1,6 @@
 package com.example.cosmocats.web;
 
+import com.example.cosmocats.featureToggle.exception.FeatureNotAvailableException;
 import com.example.cosmocats.service.exception.ProductIdAlreadyExistsException;
 import com.example.cosmocats.util.ProductValidationUtil;
 import com.example.cosmocats.web.exception.ParamsValidationDetails;
@@ -35,6 +36,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 )
                 .toList();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_PROBLEM_JSON)
                 .body(ProductValidationUtil.getProblemDetailByValidationDetails(validationDetails));
     }
 
@@ -46,6 +48,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         problemDetail.setType(URI.create("urn:problem-type:not-found"));
         problemDetail.setTitle("Product Not Found Exception");
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_PROBLEM_JSON)
                 .body(problemDetail);
     }
 
@@ -57,6 +60,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         problemDetail.setType(URI.create("urn:problem-type:internal-server-error"));
         problemDetail.setTitle("Internal Server Error");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .contentType(MediaType.APPLICATION_PROBLEM_JSON)
                 .body(problemDetail);
     }
 
@@ -67,6 +71,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         problemDetail.setType(URI.create("urn:problem-type:conflict-error"));
         problemDetail.setTitle("Product Id Already Exists Exception");
         return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(problemDetail);
+    }
+
+    @ExceptionHandler(FeatureNotAvailableException.class)
+    public ResponseEntity<Object> handleFeatureNotAvailable(FeatureNotAvailableException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problemDetail.setType(URI.create("urn:problem-type:not-found"));
+        problemDetail.setTitle("Feature Not Available Exception");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_PROBLEM_JSON)
                 .body(problemDetail);
     }
 }
