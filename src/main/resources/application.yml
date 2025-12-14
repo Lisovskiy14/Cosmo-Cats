@@ -35,6 +35,13 @@ spring:
     change-log: classpath:liquibase/changelog.yaml
     enabled: true
 
+  security:
+    api-key: cosmo-cats-api-key-2025
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://accounts.google.com
+
 
 application:
   features:
