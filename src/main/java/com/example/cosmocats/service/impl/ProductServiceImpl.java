@@ -16,6 +16,7 @@ import com.example.cosmocats.service.mapper.ProductEntityMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +32,7 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryEntityMapper categoryEntityMapper;
 
     @Override
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Transactional(readOnly = true)
     public List<Product> getAllProducts() {
         return productRepository.findAll().stream()
@@ -39,6 +41,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
     public Product getProductById(UUID id) {
         ProductEntity productEntity = productRepository.findById(id)
@@ -47,6 +50,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public Product createProduct(ProductRequestDto productRequestDto) {
         CategoryEntity categoryEntity = categoryEntityMapper.toCategoryEntity(
@@ -74,6 +78,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public Product updateProduct(UUID id, UpdateProductRequestDto updateProductRequestDto) {
         ProductEntity productEntity = productEntityMapper.toProductEntity(getProductById(id));
@@ -95,6 +100,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public void deleteProductById(UUID id) {
         productRepository.deleteById(id);

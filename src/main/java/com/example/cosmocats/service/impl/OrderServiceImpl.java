@@ -19,6 +19,7 @@ import com.example.cosmocats.service.mapper.OrderEntityMapper;
 import com.example.cosmocats.service.mapper.ProductEntityMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +40,7 @@ public class OrderServiceImpl implements OrderService {
     private final ProductEntityMapper productEntityMapper;
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
     public List<Order> getAllOrders() {
         return orderRepository.findAll().stream()
@@ -47,6 +49,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
     public List<Order> getAllOrdersByStatus(OrderStatus orderStatus) {
         return orderRepository.findAllByOrderStatus(orderStatus).stream()
@@ -55,6 +58,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Transactional(readOnly = true)
     public List<Order> getAllOrdersByCustomerId(UUID id) {
         return orderRepository.findAllByCustomerId(id).stream()
@@ -63,12 +67,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
     public Order getOrderByNaturalId(String orderNumber) {
         return orderEntityMapper.toOrder(findOrderEntityByNaturalId(orderNumber));
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Transactional
     public Order placeOrder(OrderRequestDto orderRequestDto) {
         UUID customerId = UUID.fromString(orderRequestDto.getCustomerId());
@@ -115,6 +121,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public Order updateOrderStatus(String orderNumber, UpdateOrderStatusRequestDto updateOrderStatusRequestDto) {
         OrderEntity orderEntity = findOrderEntityByNaturalId(orderNumber);
@@ -128,6 +135,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public void deleteOrderByNaturalId(String orderNumber) {
         orderRepository.deleteByNaturalId(orderNumber);

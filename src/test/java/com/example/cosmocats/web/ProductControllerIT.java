@@ -14,6 +14,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -29,7 +30,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
 @DisplayName("ProductController IT")
 @Tag("product-service")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -59,6 +59,7 @@ public class ProductControllerIT extends AbstractIT {
     @Test
     @Order(1)
     @SneakyThrows
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should Create Product Test")
     public void shouldCreateProduct() {
         Category category = Category.builder()
@@ -81,6 +82,7 @@ public class ProductControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should Return 400 Validation Error Response")
     public void shouldThrowValidationException() {
         mockMvc.perform(post("/api/v1/products")
@@ -99,6 +101,7 @@ public class ProductControllerIT extends AbstractIT {
     @Test
     @Order(2)
     @SneakyThrows
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should Return Conflict On Product Name Response")
     public void shouldReturnConflictOnProductIdResponse() {
         ProductRequestDto productRequestDto = buildProductRequestDto("Galaxy product", BigDecimal.valueOf(100));
@@ -118,6 +121,7 @@ public class ProductControllerIT extends AbstractIT {
     @Test
     @Order(2)
     @SneakyThrows
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should Get All Products Test")
     public void shouldGetAllProducts() {
         mockMvc.perform(get("/api/v1/products")
@@ -134,6 +138,7 @@ public class ProductControllerIT extends AbstractIT {
     @Test
     @Order(2)
     @SneakyThrows
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should Get Product By Id Test")
     public void shouldGetProductById() {
         UUID productId = productService.getAllProducts().getFirst().getId();
@@ -150,6 +155,7 @@ public class ProductControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should Return Product Not Found Response")
     public void shouldThrowProductNotFoundException() {
         UUID id = UUID.randomUUID();
@@ -169,6 +175,7 @@ public class ProductControllerIT extends AbstractIT {
     @Test
     @Order(2)
     @SneakyThrows
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should Update Product Test")
     public void shouldUpdateProduct() {
         UUID productId = productService.getAllProducts().getFirst().getId();
@@ -188,6 +195,7 @@ public class ProductControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should Delete Product Test")
     public void shouldDeleteProduct() {
         stubFor(WireMock.post("/payment-service/api/v1/payments")
@@ -202,6 +210,7 @@ public class ProductControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should Return 500 Response")
     public void shouldReturnInternalServerErrorResponse() {
         UUID id = UUID.randomUUID();

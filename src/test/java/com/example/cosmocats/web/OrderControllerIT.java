@@ -18,6 +18,7 @@ import net.datafaker.Faker;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -31,7 +32,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
 @DisplayName("OrderController IT")
 @Tag("order-service")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -64,6 +64,7 @@ public class OrderControllerIT extends AbstractIT {
     @Test
     @Order(1)
     @SneakyThrows
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should Place Order")
     public void shouldPlaceOrder() {
         Category category = Category.builder()
@@ -101,6 +102,7 @@ public class OrderControllerIT extends AbstractIT {
     @Test
     @Order(2)
     @SneakyThrows
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should Get All Orders")
     public void shouldGetAllOrders() {
         mockMvc.perform(get("/api/v1/orders")
@@ -118,6 +120,7 @@ public class OrderControllerIT extends AbstractIT {
     @Test
     @Order(2)
     @SneakyThrows
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should Update Order Status")
     public void shouldUpdateOrderStatus() {
         String orderNumber = orderService.getAllOrders().getFirst().getOrderNumber();
@@ -134,6 +137,7 @@ public class OrderControllerIT extends AbstractIT {
     @Test
     @Order(2)
     @SneakyThrows
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should Return Order By Order Number")
     public void shouldGetOrderByOrderNumber() {
         String orderNumber = orderService.getAllOrders().getFirst().getOrderNumber();
@@ -147,6 +151,7 @@ public class OrderControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should Return Validation Error")
     public void shouldReturnValidationError() {
         String incorrectOrderNumber = "incorrect-order-number";

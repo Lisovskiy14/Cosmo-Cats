@@ -13,6 +13,7 @@ import com.example.cosmocats.service.exception.notFound.CustomerNotFoundExceptio
 import com.example.cosmocats.service.mapper.CustomerEntityMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,12 +28,14 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerEntityMapper customerEntityMapper;
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
     public List<CustomerDetailsProjection> getAllCustomers() {
         return customerRepository.findAllBy();
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
     public Customer getCustomerById(UUID id) {
         CustomerEntity customerEntity = customerRepository.findById(id)
@@ -41,6 +44,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public Customer createCustomer(CustomerRequestDto customerRequestDto) {
         CustomerEntity conflictCustomer = customerRepository.findByEmailOrPhoneNumber(
@@ -80,6 +84,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public void deleteCustomerById(UUID id) {
         customerRepository.deleteById(id);
