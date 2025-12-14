@@ -11,7 +11,9 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -24,7 +26,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
 @DisplayName("CategoryController IT")
 @Tag("category-service")
 public class CategoryControllerIT extends AbstractIT {
@@ -67,6 +68,7 @@ public class CategoryControllerIT extends AbstractIT {
     @ParameterizedTest
     @MethodSource("provideCategoryRequests")
     @SneakyThrows
+    @WithMockUser(roles = "API")
     @DisplayName("Should Save Category")
     public void shouldSaveCategory(CategoryRequestDto categoryRequestDto) {
         mockMvc.perform(post("/api/v1/categories")
@@ -81,6 +83,7 @@ public class CategoryControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
+    @WithMockUser(roles = "API")
     @DisplayName("Should Get All Categories")
     public void shouldGetAllCategories() {
         provideCategoryRequests()
@@ -100,6 +103,7 @@ public class CategoryControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
+    @WithMockUser(roles = "API")
     @DisplayName("Should Return 404 Not Found")
     public void shouldReturn404NotFound() {
         UUID wrongId = UUID.randomUUID();
@@ -116,6 +120,7 @@ public class CategoryControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
+    @WithMockUser(roles = "API")
     @DisplayName("Should Get Category By Id")
     public void shouldGetCategoryById() {
         CategoryRequestDto categoryRequestDto = provideCategoryRequests().findFirst().get();
@@ -132,6 +137,7 @@ public class CategoryControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
+    @WithMockUser(roles = "API")
     @DisplayName("Should Delete Category")
     public void shouldDeleteCategory() {
         mockMvc.perform(delete("/api/v1/categories/{id}", UUID.randomUUID())

@@ -8,6 +8,7 @@ import com.example.cosmocats.service.exception.notFound.CategoryNotFoundExceptio
 import com.example.cosmocats.service.mapper.CategoryEntityMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryEntityMapper categoryEntityMapper;
 
     @Override
+    @PreAuthorize("hasAnyRole('API', 'ADMIN')")
     @Transactional(readOnly = true)
     public List<Category> getAllCategories() {
         return categoryRepository.findAll().stream()
@@ -30,6 +32,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('API', 'ADMIN')")
     @Transactional(readOnly = true)
     public Category getCategoryById(UUID id) {
         CategoryEntity categoryEntity = categoryRepository.findById(id)
@@ -38,6 +41,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('API', 'ADMIN')")
     @Transactional(readOnly = true)
     public Category getCategoryByName(String name) {
         CategoryEntity categoryEntity = categoryRepository.findByName(name)
@@ -46,6 +50,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('API', 'ADMIN')")
     @Transactional
     public Category saveCategory(Category category) {
         CategoryEntity categoryEntity = categoryEntityMapper.toCategoryEntity(category);
@@ -55,6 +60,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('API', 'ADMIN')")
     @Transactional
     public void deleteCategoryById(UUID id) {
         categoryRepository.deleteById(id);

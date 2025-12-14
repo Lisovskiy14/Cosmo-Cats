@@ -10,6 +10,7 @@ import com.example.cosmocats.service.exception.notFound.ProductNotFoundException
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -111,6 +112,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .detail(ex.getMessage())
                 .build();
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+                .body(problemDetail);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException ex) {
+        ProblemDetail problemDetail = ProblemDetailBuilder.builder()
+                .status(HttpStatus.FORBIDDEN)
+                .type(URI.create("urn:problem-type:access-denied"))
+                .title("Access Denied Exception")
+                .detail(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .contentType(MediaType.APPLICATION_PROBLEM_JSON)
                 .body(problemDetail);
     }

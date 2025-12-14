@@ -11,7 +11,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -25,7 +25,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
 @DisplayName("CustomerController IT")
 @Tag("customer-service")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -76,6 +75,7 @@ public class CustomerControllerIT extends AbstractIT {
     @SneakyThrows
     @DisplayName("Should Save Customer")
     @ParameterizedTest
+    @WithMockUser(roles = "ADMIN")
     @MethodSource("provideCustomerRequests")
     public void shouldSaveCustomer(CustomerRequestDto customerRequestDto) {
         mockMvc.perform(post("/api/v1/customers")
@@ -93,6 +93,7 @@ public class CustomerControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should Return Conflict on Customer Email")
     public void shouldReturnConflictOnCustomerEmail() {
         String email = faker.internet().emailAddress();
@@ -122,6 +123,7 @@ public class CustomerControllerIT extends AbstractIT {
     @Test
     @Order(2)
     @SneakyThrows
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should Get All Customers")
     public void shouldGetAllProducts() {
         mockMvc.perform(get("/api/v1/customers")
@@ -137,6 +139,7 @@ public class CustomerControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should Return 404 Not Found")
     public void shouldReturn404NotFound() {
         UUID wrongId = UUID.randomUUID();
@@ -153,6 +156,7 @@ public class CustomerControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should Get Customer By Id")
     public void shouldGetCustomerById() {
         CustomerRequestDto customerRequestDto = buildCustomerRequestDto();
@@ -172,6 +176,7 @@ public class CustomerControllerIT extends AbstractIT {
 
     @Test
     @SneakyThrows
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Should Delete Customer")
     public void shouldDeleteCustomer() {
         mockMvc.perform(delete("/api/v1/customers/{id}", UUID.randomUUID())
